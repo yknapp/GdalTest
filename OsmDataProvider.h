@@ -2,17 +2,15 @@
 
 #include "ogrsf_frmts.h"
 
-#include <QString>
-
 namespace ibh {
 class OsmDataProvider {
 public:
-    bool open(const QString& path);
+    bool open(const std::string& path);
     bool close();
-    void searchStreet(const int cityId, const QString& streetName);
+    void searchStreet(const int cityId, const std::string& streetName);
 
 private:
-    QString m_filePath;
+    std::string m_filePath;
     GDALDataset* m_dataset;
 };
 }

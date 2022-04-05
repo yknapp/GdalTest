@@ -1,24 +1,17 @@
 #include "OsmDataProvider.h"
 
-#include <QDebug>
-#include <QFileInfo>
 #include <chrono>
+#include <iostream>
 
 namespace ibh {
-bool OsmDataProvider::open(const QString& path)
+bool OsmDataProvider::open(const std::string& path)
 {
-    qInfo() << "Opening spatial database" << path;
-    const auto file = QFileInfo(path);
-    if (!file.exists()) {
-        qWarning() << "Cannot open file '" << path << "', because it does not exist";
-        return {};
-    }
-
+    std::cout << "Opening spatial database\n";
     GDALAllRegister();
 
-    m_dataset = static_cast<GDALDataset*>(GDALOpenEx(path.toStdString().c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL));
+    m_dataset = static_cast<GDALDataset*>(GDALOpenEx(path.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL));
     if (!m_dataset) {
-        qWarning() << "Opening file '" << path << "' failed";
+        std::cout << "Opening file '" << path << "' failed\n";
         return {};
     }
 
@@ -27,28 +20,28 @@ bool OsmDataProvider::open(const QString& path)
 
 bool OsmDataProvider::close()
 {
-    qInfo() << "Closing spatial database";
+    std::cout << "Closing spatial database\n";
     GDALClose(m_dataset);
     m_dataset = nullptr;
     return true;
 }
 
-void OsmDataProvider::searchStreet(const int cityId, const QString& streetName)
+void OsmDataProvider::searchStreet(const int cityId, const std::string& streetName)
 {
-    qInfo() << QString("Search streets with name '%1' in city with ID '%2'").arg(streetName).arg(cityId);
+    std::cout << "Search streets with name '" << streetName << "' in city with ID '" << cityId << "\n";
 
-    if (streetName.isEmpty()) {
-        qWarning() << "Cannot search streets without a given name";
+    if (streetName.empty()) {
+        std::cout << "Cannot search streets without a given name\n";
         return;
     }
 
     if (cityId <= 0) {
-        qWarning() << "Cannot search streets without a given valid city ID";
+        std::cout << "Cannot search streets without a given valid city ID\n";
         return;
     }
 
     if (!m_dataset) {
-        qWarning() << "Cannot search street, because dataset is not set";
+        std::cout << "Cannot search street, because dataset is not set\n";
         return;
     }
 
@@ -56,14 +49,13 @@ void OsmDataProvider::searchStreet(const int cityId, const QString& streetName)
     const auto cityBoundaryTable = "ln_boundary";
     OGRLayer* poLayer = m_dataset->GetLayerByName(cityBoundaryTable);
     if (!poLayer) {
-        qCritical() << "Failed to get layer for table " << cityBoundaryTable;
-        assert(0);
+        std::cout << "Failed to get layer for table " << cityBoundaryTable << "\n";
         return;
     }
     poLayer->ResetReading(); // ensure starting at beginning of layer
     auto poFeature = poLayer->GetFeature(cityId);
     if (!poFeature) {
-        qDebug() << "No city found with ID " << cityId;
+        std::cout << "No city found with ID " << cityId << "\n";
         return;
     }
     const auto foundBoundary = poFeature->GetGeometryRef();
@@ -71,8 +63,8 @@ void OsmDataProvider::searchStreet(const int cityId, const QString& streetName)
     // search streets within boundary bounding box
     const auto highwayTable = "ln_highway";
     poLayer = m_dataset->GetLayerByName(highwayTable);
-    const auto streetNameFilter = QString("name LIKE '%1%'").arg(streetName);
-    poLayer->SetAttributeFilter(streetNameFilter.toStdString().c_str());
+    const auto streetNameFilter = "name LIKE '" + streetName + "%'";
+    poLayer->SetAttributeFilter(streetNameFilter.c_str());
     OGREnvelope envelope;
     foundBoundary->getEnvelope(&envelope);
     poLayer->SetSpatialFilterRect(envelope.MinX, envelope.MinY, envelope.MaxX, envelope.MaxY);
@@ -82,14 +74,14 @@ void OsmDataProvider::searchStreet(const int cityId, const QString& streetName)
     auto start = std::chrono::steady_clock::now();
     while ((poFeature = poLayer->GetNextFeature())) {
         auto end = std::chrono::steady_clock::now();
-        qInfo() << "Time needed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms";
+        std::cout << "Time needed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms\n";
 
         start = std::chrono::steady_clock::now();
         const auto id = poFeature->GetFID();
         const auto nameIndex = poFeature->GetFieldIndex("name");
         const auto name = poFeature->GetFieldAsString(nameIndex);
 
-        qInfo() << "Found street: ID: " << id << "; name:" << name;
+        std::cout << "Found street: ID: " << id << "; name:" << name << "\n";
     }
 
     // reset filter for future queries

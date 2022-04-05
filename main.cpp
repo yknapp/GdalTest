@@ -4,7 +4,7 @@ int main(int argc, char* argv[])
 {
     ibh::OsmDataProvider provider;
     // path to OSM database
-    QString osmFilePath = "germany-latest.spatialite_osm_map";
+    std::string osmFilePath = "germany-latest.spatialite_osm_map";
     provider.open(osmFilePath);
 
     auto start = std::chrono::steady_clock::now();

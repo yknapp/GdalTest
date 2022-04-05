@@ -17,18 +17,12 @@ set(HEADER
 find_package(GDAL
     REQUIRED)
 
-find_package(
-    Qt6
-    COMPONENTS Core
-    REQUIRED)
-
 add_executable(${PROJECT_NAME} main.h ${HEADER} ${SOURCES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(
     ${PROJECT_NAME}
-    Qt${QT_VERSION_MAJOR}::Core
     ${GDAL_LIBRARIES})
 
 target_include_directories(
