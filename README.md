@@ -3,6 +3,13 @@
 
 ## General
 This repo is for investigating the performance drop of GDAL from `3.4.1` to `3.4.2`.
+To replicate the following results, two vcpkg exports are provided [here](https://drive.google.com/drive/folders/11TYCflrL2rzybpejnd9Gs7V3zjrGdvon?usp=sharing) containing the two different GDAL versions and also the OpenStreetMap database.
+
+## Build
+
+`cmake.exe -S {PATH_TO_PROJECT}/gdalTest -B {BUILD_FOLDER} -DCMAKE_TOOLCHAIN_FILE={PATH_TO_VCPKG}/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows`
+
+Example: `C:\Qt\Tools\CMake_64\bin\cmake.exe -S C:/workspace/gdalTest -B C:/workspace/build -DCMAKE_TOOLCHAIN_FILE=C:\workspace\vcpkg\scripts\buildsystems\vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows`
 
 ## Performance logs
 
