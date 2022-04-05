@@ -2,8 +2,8 @@
 
 
 ## General
-This repo is for investigating the performance drop of GDAL from `3.4.1` to `3.4.2`.
-To replicate the following results, two vcpkg exports are provided [here](https://drive.google.com/drive/folders/11TYCflrL2rzybpejnd9Gs7V3zjrGdvon?usp=sharing) containing the two different GDAL versions and also the OpenStreetMap database.
+This repo is for investigating the performance drop of GDAL from `3.4.1` to `3.4.2`.  
+To replicate the results (see `Performance logs` below), two vcpkg exports containing the different GDAL versions and the OSM database are provided here: [https://drive.google.com/drive/folders/11TYCflrL2rzybpejnd9Gs7V3zjrGdvon?usp=sharing](https://drive.google.com/drive/folders/11TYCflrL2rzybpejnd9Gs7V3zjrGdvon?usp=sharing).
 
 ## Build
 
